@@ -103,44 +103,44 @@ export default {
   name: 'Navbar',
   data () {
     return {
-      isSidebarOpen: true,
-      isDropdownAvatarOpen: false,
-      isDropdownAlertOpen: false
+      isSidebarOpen: true, // флаг для открытия/закрытия боковой панели
+      isDropdownAvatarOpen: false, // флаг для открытия/закрытия выпадающего меню аватара
+      isDropdownAlertOpen: false // флаг для открытия/закрытия выпадающего меню уведомлений
     }
   },
   mounted () {
-    document.addEventListener('click', this.documentClick)
+    document.addEventListener('click', this.documentClick) // добавление обработчика события при монтировании компонента
   },
   beforeUnmount () {
-    document.removeEventListener('click', this.documentClick)
+    document.removeEventListener('click', this.documentClick) // удаление обработчика события при размонтировании компонента
   },
   methods: {
-    navbarToggleClick () {
+    navbarToggleClick () { // метод для открытия/закрытия боковой панели
       this.isSidebarOpen = !this.isSidebarOpen
-      this.$emit('navbar-clicked', this.isSidebarOpen)
+      this.$emit('navbar-clicked', this.isSidebarOpen) // эмиттинг события при клике на навбар
     },
-    alertLinkClick () {
+    alertLinkClick () { // метод для открытия/закрытия выпадающего меню уведомлений
       this.isDropdownAlertOpen = !this.isDropdownAlertOpen
-      this.isDropdownAvatarOpen = false
+      this.isDropdownAvatarOpen = false // закрытие выпадающего меню аватара
     },
-    avatarLinkClick () {
+    avatarLinkClick () { // метод для открытия/закрытия выпадающего меню аватара
       this.isDropdownAvatarOpen = !this.isDropdownAvatarOpen
-      this.isDropdownAlertOpen = false
+      this.isDropdownAlertOpen = false // закрытие выпадающего меню уведомлений
     },
-    documentClick (event) {
+    documentClick (event) { // метод для обработки клика по документу
       const dropdownAvatar = document.querySelector('.dropdown-avatar')
       const avatarLink = document.getElementById('avatar-link')
       const dropdownAlert = document.querySelector('.dropdown-alert')
       const alertLink = document.getElementById('alert-link')
-      if (!dropdownAvatar.contains(event.target) && !dropdownAlert.contains(event.target) && !alertLink.contains(event.target) && !avatarLink.contains(event.target)) {
+      if (!dropdownAvatar.contains(event.target) && !dropdownAlert.contains(event.target) && !alertLink.contains(event.target) && !avatarLink.contains(event.target)) { // если клик был не по выпадающим меню
         this.isDropdownAvatarOpen = false
         this.isDropdownAlertOpen = false
       }
     },
-    logout () {
+    logout () { // метод для выхода из системы
       console.log('Logout')
-      localStorage.removeItem('token')
-      this.$router.push('/login?action=logout')
+      localStorage.removeItem('token') // удаление токена из локального хранилища
+      this.$router.push('/login?action=logout') // переход на страницу логина
     }
   }
 }

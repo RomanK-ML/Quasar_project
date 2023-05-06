@@ -18,7 +18,7 @@ export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Sidebar',
   props: {
-    isOpenSidebar: Boolean
+    isOpenSidebar: Boolean //определяет состояние боковой панели (открыта или закрыта)
   }
 }
 </script>
