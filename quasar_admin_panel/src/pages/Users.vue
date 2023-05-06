@@ -148,42 +148,50 @@ export default {
   name: 'Users',
   data() {
     return {
-      modalUserId: 0,
-      modalSip: '',
-      modalName: '',
-      modalEmail: '',
-      modalPhone: '',
-      modalPassword: '',
-      modalRole: '',
-      modalSearch: '',
-      searchMinCharacters: 0,
-      modalEditUserShown: false,
-      selectedString: '',
-      modalHeaderTitle: '',
-      nameInputIsValid: true,
-      emailInputIsValid: true,
-      phoneInputIsValid: true,
-      sipInputIsValid: true,
-      passwordInputIsValid: true,
-      roleInputIsValid: true,
-      modalAddOrEditUser: false,
-      pagination: {
-        align: "left",
-        sortBy: 'id',
-        descending: false,
-        page: 2,
-        rowsPerPage: 5,
-        rowsPerPageOptions: [5, 10, 20, 30, 40],
-        totalRows: 20,
+      modalUserId: 0, // id пользователя в модальном окне
+      modalSip: '', // SIP пользователя в модальном окне
+      modalName: '', // имя пользователя в модальном окне
+      modalEmail: '', // электронная почта пользователя в модальном окне
+      modalPhone: '', // номер телефона пользователя в модальном окне
+      modalPassword: '', // пароль пользователя в модальном окне
+      modalRole: '', // роль пользователя в модальном окне
+      modalSearch: '', // поисковый запрос в таблице
+      searchMinCharacters: 0, // минимальное количество символов в поисковом запросе
+      modalEditUserShown: false, // флаг отображения модального окна
+      selectedString: '', // строка с информацией о количестве выбранных пользователей
+      modalHeaderTitle: '', // заголовок модального окна
+      nameInputIsValid: true, // флаг валидации поля имени
+      emailInputIsValid: true, // флаг валидации поля электронной почты
+      phoneInputIsValid: true, // флаг валидации поля номера телефона
+      sipInputIsValid: true, // флаг валидации поля SIP
+      passwordInputIsValid: true, // флаг валидации поля пароля
+      roleInputIsValid: true, // флаг валидации поля роли
+      modalAddOrEditUser: false, // флаг добавления или редактирования пользователя
+      pagination: {// объект настроек пагинации в таблице
+        align: "left", // выравнивание пагинации
+        sortBy: 'id', // поле, по которому происходит сортировка
+        descending: false, // порядок сортировки
+        page: 2, // текущая страница
+        rowsPerPage: 5, // количество строк на странице
+        rowsPerPageOptions: [5, 10, 20, 30, 40], // опции количества строк на странице
+        totalRows: 20, // общее количество строк в таблице
       },
-      columns: [
+      columns: [/ настройки колонок таблицы
         {
+          /*
           name: 'id', // название колонки
-          label: 'Id',
+          label: 'Id', // метка колонки
           field: 'id', // поле данных, на которое ссылается колонка
           align: 'left', // выравнивание текста в колонке
           sortable: true, // возможность сортировки по колонке
           required: true, //(необязательно) столбец всегда будет видимым
+          */
+          name: 'id',
+          label: 'Id',
+          field: 'id',
+          align: 'left',
+          sortable: true,
+          required: true,
         },
         {
           name: 'userId',
@@ -251,19 +259,23 @@ export default {
     }
   },
   computed: {
+    //вычисляет максимальное количество страниц
     maxPages() {
       return Math.ceil(this.pagination.totalRows / this.pagination.rowsPerPage)
     },
+    //вычисляет строку с информацией о текущей пагинации
     paginationLabel() {
       const {from, to, total} = this.$q.pagination.normalize(this.pagination, this.rows.length)
       return `Showing ${from}-${to} of ${total}`
     }
   },
+  //происходит обновление базы данных, установка начальных значений таблицы и инициализация пагинации
   mounted() {
     db.updateDb()
     this.rows = db.usersList
     this.pagination.totalRows = this.rows.length
   },
+  //следит за изменением массива выбранных пользователей и обновляющее строку с информацией о количестве выбранных пользователей
   watch: {
     selected: {
       handler() {
@@ -273,9 +285,11 @@ export default {
     },
   },
   methods: {
+    // Метод возвращает строку выбранных элементов
     getSelectedString() {
       return this.selectedString;
     },
+    // Метод удаляет элемент из выбранных элементов по его ID
     deleteItemForSelectedList(id) {
       console.log('ID: ' + id);
       if (this.selected.length > 0) {
@@ -287,6 +301,7 @@ export default {
         }
       }
     },
+    // Метод удаляет строку из таблицы и из базы данных по её ID
     deleteRow(id) {
       console.log('delete')
       console.log(id)
@@ -295,10 +310,14 @@ export default {
       this.deleteItemForSelectedList(id)
       console.log(db.usersList)
     },
+    // Метод удаляет выбранные строки из таблицы и из базы данных
     deleteSelectedRow() {
+      // Получение списка ID выбранных строк
       const idList = this.selected.map(item => item.id);
       if (idList.length > 0) {
+        // Удаление выбранных строк из базы данных
         db.deleteUsers(idList)
+        // Очистка списка выбранных строк
         this.selected = []
       }
     },
