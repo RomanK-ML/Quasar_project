@@ -53,28 +53,36 @@ class Database {
     // const result = await this.connection.execute('SELECT * FROM users')
     // console.log(result)
   }
+// Функция для генерации токена по email и паролю пользователя
   generatedTokenByEmailAndPassword(email, password) {
+    // Проверяем наличие email и password
     if (email && password) {
+      // Ищем пользователя с заданным email и паролем
       const user = this.usersList.find(user => user.email === email && user.password === password)
       if (user){
+        // Если пользователь найден, то генерируем для него токен
         return this.generateToken(user);
       }
     }
+    // Если email или password не заданы или пользователь не найден, то возвращаем false
     return false;
   }
+
   deleteUsers(idList){
-    console.log(idList)
+    console.log(idList) // выводим список id пользователей, которых нужно удалить
     for (let user in this.usersList) {
-      for (let idDel in idList) {
-        if (this.usersList[user].id === idList[idDel]) {
-          this.usersList.splice(user, 1);
+      for (let idDel in idList) { // перебираем список id пользователей, которых нужно удалить
+        if (this.usersList[user].id === idList[idDel]) { // если текущий пользователь в списке на удаление
+          this.usersList.splice(user, 1); // удаляем пользователя из массива пользователей
         }
       }
     }
   }
   editUser(userId, sip, name, email, phone, password, role){
+    // Ищем пользователя с заданным userId
     for (let user in this.usersList) {
       if (this.usersList[user].userId === userId){
+        // Обновляем данные пользователя
         this.usersList[user].name = name;
         this.usersList[user].email = email;
         this.usersList[user].phone = phone;
@@ -84,79 +92,116 @@ class Database {
       }
     }
   }
+  /**
+   * Функция добавляет нового пользователя в массив пользователей
+   * @param {string} sip - SIP-адрес пользователя
+   * @param {string} name - Имя пользователя
+   * @param {string} email - Электронная почта пользователя
+   * @param {string} phone - Телефон пользователя
+   * @param {string} password - Пароль пользователя
+   * @param {string} role - Роль пользователя
+   */
   addUser(sip, name, email, phone, password, role){
-    this.usersList.push({id: this.usersList.length+1, userId: this.generateUserId(), sip: sip, name: name, email: email, phone: phone, password: password, role: role})
+    // Генерируем userId для нового пользователя
+    const userId = this.generateUserId();
+    // Добавляем нового пользователя в массив пользователей
+    this.usersList.push({id: this.usersList.length+1, userId: userId, sip: sip, name: name, email: email, phone: phone, password: password, role: role})
   }
+
+  /*
+ * Функция поиска пользователей в базе данных по тексту запроса
+ * @param {string} searchText - текст запроса
+ */
   searchUsers(searchText){
     console.log(searchText);
     let usersResult = reactive([])
-    this.updateDb()
+    this.updateDb() // обновляем базу данных перед поиском
     this.usersList.forEach(user =>{
       if (user.name.toLowerCase().includes(searchText.toLowerCase()) || user.email.toLowerCase().includes(searchText.toLowerCase())) {
-        usersResult.push(user);
+        usersResult.push(user); // добавляем пользователя в результаты поиска
       }
     })
-    this.usersList = usersResult
+    this.usersList = usersResult // обновляем список пользователей
   }
   updateDb(){
+    // обновляем базу данных
     this.usersList = this.usersDb
   }
   generateUserId(){
     let userId = 0;
+    /// Бесконечный цикл для генерации userId
     while (true){
-      userId = Math.floor(Math.random() * 99999999) + 1;
-      let result  = this.usersList.find(user=>user.userId === userId)
+      userId = Math.floor(Math.random() * 99999999) + 1; // генерация случайного числа от 1 до 99999999
+      let result  = this.usersList.find(user => user.userId === userId) // проверка, существует ли пользователь с таким userId
       if (result){
-        console.log('Такой userId уже есть')
+        console.log('Такой userId уже есть') // если такой userId уже существует, выводим сообщение об этом в консоль
       }
       else {
-        break
+        break // если такого userId нет, выходим из цикла
       }
     }
-    return userId
+    return userId // возвращаем сгенерированный уникальный userId
   }
   generateToken(user) {
+    // Создание заголовка токена
     const header =  {
       "type": "JWT",
       "alg": "HS256"
     }
+    // Кодирование заголовка в формат Base64
     const encodedHeader = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));
 
+    // Создание данных для токена
     const data = {
       "Id": user.userId,
       "Email": user.email,
     }
+    // Кодирование данных в формат Base64
     const encodedData = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(JSON.stringify(data)));
+    // Создание токена путем объединения закодированного заголовка и закодированных данных
     const token = `${encodedHeader}.${encodedData}`;
+    // Создание подписи токена путем кодирования HMAC-256 хэша токена с использованием ключа доступа
     const signature = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(token, this.keyForToken));
 
-
+    // Вывод токена и подписи в консоль для отладки
     console.log('generateToken')
     console.log(`${token}.${signature}`)
 
+    // Возврат строки, представляющей токен и подпись
     return `${token}.${signature}`;
   }
   verificationToken(token){
+    // Разделяем токен на 3 части: заголовок, данные и подпись
     const [encodedHeader, encodedData, signature] = token.split('.');
+
+    // Декодируем данные из base64 формата и парсим их как JSON объект
     const data = JSON.parse(CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(encodedData)));
+
+    // Генерируем HMAC хэш используя ключ и объединенную строку из заголовка и данных
     const hash = CryptoJS.HmacSHA256(`${encodedHeader}.${encodedData}`, this.keyForToken);
+
+    // Переводим полученный хэш в строку в формате base64
     const expectedSignature = CryptoJS.enc.Base64.stringify(hash);
+
+    // Сверяем полученную подпись и ожидаемую
     if (signature === expectedSignature){
+      // Если подписи совпадают, то парсим заголовок и данные
       const header = JSON.parse(CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(encodedHeader)));
       const data = JSON.parse(CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(encodedData)));
 
+      // Проверяем, есть ли пользователь с такими данными (email и userId) в нашей базе
       const isUser = this.usersList.some(user => user.email === data["Email"] && user.userId === data["Id"])
-      console.log("Verifecation token")
+      console.log("Verification token")
       console.log(data)
       console.log(isUser)
       if (isUser){
-        return true;
+        return true; // Если пользователь найден, возвращаем true
       }
       else {
-        return false;
+        return false; // Если пользователь не найден, возвращаем false
       }
     }
-    return false
+    return false; // Если подписи не совпадают, возвращаем false
   }
 }
 
