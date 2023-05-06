@@ -44,67 +44,70 @@ export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Login',
   mounted() {
-    db.updateDb()
+    db.updateDb() // вызываем функцию для обновления базы данных
   },
   data () {
     return{
       emailInputValue: '',
       passwordInputValue: '',
-      cardErrorIsShown: false,
-      emailInputIsValid: true,
-      passwordInputIsValid: true,
+      cardErrorIsShown: false, // флаг для показа ошибки
+      emailInputIsValid: true, // флаг для проверки валидности ввода почты
+      passwordInputIsValid: true, // флаг для проверки валидности ввода пароля
     }
   },
   methods: {
-    validationButtonClick(){
-      if (this.validationForm()){
+    validationButtonClick(){ // функция для обработки события нажатия на кнопку валидации
+      if (this.validationForm()){ // если форма валидна, вызываем функцию авторизации
         this.authorization()
       }
     },
-    validationForm(){
-      this.emailRules(this.emailInputValue)
-      this.passwordRules(this.passwordInputValue)
-      if (this.emailInputIsValid && this.passwordInputIsValid){
+    validationForm(){ // функция для проверки валидности введенных данных
+      this.emailRules(this.emailInputValue) // проверяем валидность ввода почты
+      this.passwordRules(this.passwordInputValue) // проверяем валидность ввода пароля
+      if (this.emailInputIsValid && this.passwordInputIsValid){ // если оба поля валидны, сбрасываем флаг ошибки и возвращаем true
         this.cardErrorIsShown = false
         return true
       }
-      else {
+      else { // если есть ошибки, устанавливаем флаг ошибки и возвращаем false
         this.cardErrorIsShown = true
         return false
       }
     },
-    emailRules(value){
+    emailRules(value){ // функция для проверки валидности ввода почты
       console.log(value)
       const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (value && pattern.test(value)) {
+      if (value && pattern.test(value)) { // если введенная почта валидна, устанавливаем флаг валидности почты и возвращаем true
         this.emailInputIsValid = true
         console.log("Email is valid");
         return true
-      } else {
+      } else { // если введенная почта не валидна, сбрасываем флаг валидности почты и возвращаем false
         this.emailInputIsValid = false
         console.log("Email is not valid");
         return false
       }
     },
-    passwordRules(value){
+    passwordRules(value){ // функция для проверки валидности ввода пароля
       console.log(value)
-      if (value && value.length >= 8) {
+      if (value && value.length >= 8) { // если введенный пароль валиден, устанавливаем флаг валидности пароля и возвращаем true
         this.passwordInputIsValid = true
         console.log("Password is valid");
         return true
-      } else {
+      } else { // если введенный пароль не валиден, сбрасываем флаг валидности пароля и возвращаем false
         this.passwordInputIsValid = false
         console.log("Password is not valid");
         return false
       }
     },
+    // Функция для авторизации пользователя
     async authorization(){
+      // Генерируем токен, используя данные из формы
       const result = db.generatedTokenByEmailAndPassword(this.emailInputValue, this.passwordInputValue)
+      // Если токен был успешно сгенерирован, сохраняем его в localStorage и переходим на главную страницу
       if (result !== false) {
         localStorage.setItem('token', result)
         console.log("Token: " + result)
         this.$router.push("/")
-      } else {
+      } else {// Если авторизация не прошла успешно, показываем ошибку в форме
         console.log("Login is not valid");
         this.cardErrorIsShown = true
       }

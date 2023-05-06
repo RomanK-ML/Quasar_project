@@ -302,9 +302,13 @@ export default {
         this.selected = []
       }
     },
+    // Открыть модальное окно для добавления нового пользователя
     openModalAddUser(){
+      // Установить флаг для отображения модального окна добавления пользователя
       this.modalAddOrEditUser = true;
+      // Установить заголовок модального окна
       this.modalHeaderTitle = 'Добавить пользователя'
+      // Установить значения для полей модального окна
       this.modalUserId = 0
       this.modalSip = ''
       this.modalName = ''
@@ -312,11 +316,16 @@ export default {
       this.modalPhone = ''
       this.modalPassword = ''
       this.modalRole = 'user'
+      // Показать модальное окно
       this.modalEditUserShown = true;
     },
+    // Открыть модальное окно для редактирования пользователя
     openModalEditUser(rowItem) {
+      // Если передан объект строки таблицы
       if (rowItem) {
+        // Установить флаг для отображения модального окна редактирования пользователя
         this.modalAddOrEditUser = false;
+        // Установить значения для полей модального окна из переданного объекта строки таблицы
         this.modalUserId = rowItem.userId
         this.modalSip = rowItem.sip
         this.modalName = rowItem.name
@@ -324,7 +333,9 @@ export default {
         this.modalPhone = rowItem.phone
         this.modalPassword = rowItem.password
         this.modalRole = rowItem.role
+        // Установить заголовок модального окна
         this.modalHeaderTitle = 'Редактировать пользователя'
+        // Показать модальное окно
         this.modalEditUserShown = true;
       }
       console.log('modalUserId: ' + this.modalUserId)
@@ -335,13 +346,18 @@ export default {
       console.log('modalPassword: ' + this.modalPassword)
       console.log('modalRole: ' + this.modalRole)
     },
+    // Отправить форму для добавления нового пользователя
     modalAddUserSubmit(){
 
+      // Вызвать функцию добавления пользователя из базы данных, используя значения из модального окна
       db.addUser(this.modalSip, this.modalName, this.modalEmail, this.modalPhone, this.modalPassword, this.modalRole)
+      // Скрыть модальное окно
       this.modalEditUserShown = false;
     },
     modalEditUserSubmit() {
+      // вызов функции редактирования пользователя из базы данных
       db.editUser(this.modalUserId, this.modalSip, this.modalName, this.modalEmail, this.modalPhone, this.modalPassword, this.modalRole)
+      // вывод данных пользователя, которые были изменены
       console.log('modalId: ' + this.modalUserId)
       console.log('modalSip: ' + this.modalSip)
       console.log('modalName: ' + this.modalName)
@@ -349,17 +365,22 @@ export default {
       console.log('modalPhone: ' + this.modalPhone)
       console.log('modalPassword: ' + this.modalPassword)
       console.log('modalRole: ' + this.modalRole)
+      // закрытие модального окна редактирования пользователя
       this.modalEditUserShown = false;
     },
     modalEditUserClose(){
+      // закрытие модального окна редактирования пользователя
       this.modalEditUserShown = false;
     },
     modalSearchTextUpdate() {
       console.log('modalSearchTextUpdate')
+      // если в поисковой строке введено достаточно символов, вызываем функцию поиска пользователей в базе данных
       if (this.modalSearch.length >= this.searchMinCharacters) {
         db.searchUsers(this.modalSearch)
       }
+      // обновляем список пользователей на странице
       this.rows = db.usersList
+      // обновляем общее количество пользователей в пагинации
       this.pagination.totalRows = this.rows.length;
     }
   }
@@ -368,19 +389,6 @@ export default {
 
 <style scoped>
 .body-container{
-  --bs-card-spacer-y: 1.25rem;
-  --bs-card-spacer-x: 1.25rem;
-  --bs-card-title-spacer-y: 0.5rem;
-  --bs-card-border-width: 0;
-  --bs-card-border-color: transparent;
-  --bs-card-border-radius: 0.25rem;
-  --bs-card-inner-border-radius: 0.25rem;
-  --bs-card-cap-padding-y: 1rem;
-  --bs-card-cap-padding-x: 1.25rem;
-  --bs-card-cap-bg: #222e3c;
-  --bs-card-bg: #222e3c;
-  --bs-card-img-overlay-padding: 1rem;
-  --bs-card-group-margin: 12px;
   word-wrap: break-word;
   background-clip: border-box;
   background-color: #222e3c;
@@ -403,8 +411,6 @@ export default {
 
 .table-top {
   width: 100%;
-  --bs-gutter-x: 12px;
-  --bs-gutter-y: 0;
   display: flex;
   flex-wrap: wrap;
   margin: 0 -12px;
