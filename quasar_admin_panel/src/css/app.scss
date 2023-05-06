@@ -1,0 +1,74 @@
+body {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(255,255,255,0);
+  background-color: #19222c;
+  color: #bdc0c5;
+  font-family: "Inter", "Roboto",sans-serif;;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+  opacity: 1 !important;
+  overflow-y: scroll;
+  height: 100%;
+  direction: rtl;
+}
+
+*, :after, :before {
+  box-sizing: border-box;
+}// app global css in SCSS form
+
+.q-field__native {
+  color: #bdc0c5;
+  display: inline-block;
+  margin-left: 0.5em;
+  width: auto;
+  border-radius: .1rem;
+  font-size: .75rem;
+  min-height: calc(1.525rem + 2px);
+  padding: .2rem .5rem !important;
+  text-align: left;
+
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-clip: padding-box;
+  background-color: #222e3c;
+  border: 1px solid #7a828a;
+  font-weight: 400;
+  line-height: 1.5 !important;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  direction: ltr;
+}
+.q-field__control{
+  min-height: calc(1.525rem + 2px);
+  height: auto !important;
+}
+.q-field__label{
+  left: -50px;
+  top: 5px !important;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #bdc0c5 !important;
+  transition: none !important;
+  transform: none !important;
+}
+input, i{
+  color: #bdc0c5;
+}
+button{
+  background-color: #326abc;
+  border-color: #2f64b1;
+  color: #fff;
+  font-family: "Inter", "Roboto",sans-serif;;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.q-card__section{
+  padding: 0;
+
+}
+
