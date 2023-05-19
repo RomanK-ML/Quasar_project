@@ -12,7 +12,9 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 
 const { configure } = require("quasar/wrappers");
 
+
 module.exports = configure(function (ctx) {
+
   return {
     // https://v2.quasar.dev/quasar-cli-webpack/supporting-ts
     supportTS: false,
@@ -44,6 +46,34 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-build
     build: {
+      // env: {
+      //   NODE_DEBUG: 'crypto',
+      // },
+
+      extendWebpack (cfg) {
+        cfg.resolve.fallback = {
+          crypto: require.resolve('crypto-browserify'),
+          zlib: require.resolve('browserify-zlib'),
+          fs: require.resolve('browserify-fs'),
+          path: require.resolve('path-browserify'),
+          buffer: require.resolve('buffer'),
+          process: require.resolve('processify'),
+        }
+      },
+      configureWebpack:{
+        resolve: {
+          fallback: {
+            crypto: require.resolve('crypto-browserify'),
+            stream: require.resolve('stream-browserify'),
+            util: require.resolve('util.promisify'),
+            zlib: require.resolve('pako'),
+            fs: require.resolve('browserify-fs'),
+            path: require.resolve('path-browserify'),
+            buffer: require.resolve('buffer'),
+            process: require.resolve('processify'),
+          }
+        }
+      },
       vueRouterMode: "history", // available values: 'hash', 'history'
 
       // transpile: false,
@@ -80,6 +110,10 @@ module.exports = configure(function (ctx) {
       },
       port: 8080,
       open: true, // opens browser window automatically
+    },
+    node: {
+      Buffer: true,
+      process: true,
     },
 
     // https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-framework
@@ -227,9 +261,4 @@ module.exports = configure(function (ctx) {
       },
     },
   };
-  // resolve: {
-  //   fallback: {
-  //     util: require.resolve('util/')
-  //   }
-  // },
 });

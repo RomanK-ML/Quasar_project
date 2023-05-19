@@ -1,22 +1,18 @@
 import { reactive } from 'vue'
 import CryptoJS from 'crypto-js';
 
-class User {
-  constructor(id, name, email, password) {
-    this.id = id;
-    this.name = name;
-    this.email = email;
-    this.password = password;
-  }
-}
+
+import process from 'processify';
+import { Buffer } from 'buffer';
+import {connect} from "net";
+window.process = process;
+window.process.platform = 'win32';
+window.process.env = { NODE_DEBUG: '' };
+window.process.version = 'v' + navigator.appVersion;
+window.Buffer = Buffer;
+const fs = require('fs');
 
 class Database {
-  config = {
-    database: 'quasar_db',
-    host: 'localhost',
-    user: 'root',
-    password: '',
-  }
   keyForToken = "z%C*F-J@NcRfUjXn2r5u8x/A?D(G+KbP"
   connection;
 
@@ -47,12 +43,6 @@ class Database {
     console.log('Database constructor')
   }
 
-  async connect() {
-    console.log('Connecting')
-    // this.connection = await mysql.createConnection(config)
-    // const result = await this.connection.execute('SELECT * FROM users')
-    // console.log(result)
-  }
 // Функция для генерации токена по email и паролю пользователя
   generatedTokenByEmailAndPassword(email, password) {
     // Проверяем наличие email и password
