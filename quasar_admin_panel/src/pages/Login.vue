@@ -101,7 +101,7 @@ export default {
     // Функция для авторизации пользователя
     async authorization(){
       // Генерируем токен, используя данные из формы
-      const result = db.generatedTokenByEmailAndPassword(this.emailInputValue, this.passwordInputValue)
+      const result = db.generatedAuthTokenByEmailAndPassword(this.emailInputValue, this.passwordInputValue)
       // Если токен был успешно сгенерирован, сохраняем его в localStorage и переходим на главную страницу
       if (result !== false) {
         localStorage.setItem('token', result)

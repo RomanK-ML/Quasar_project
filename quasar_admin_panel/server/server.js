@@ -1,6 +1,6 @@
 const express = require('express');
 const { Sequelize, DataTypes } = require('sequelize')
-const fs = require('fs');
+const fs = require('fs').promises;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -23,9 +23,6 @@ class DataBaseServer{
   };
   sequelize;
   User;
-
-
-
 
   constructor() {
     // Подключение промежуточного ПО для обработки тела запроса
@@ -87,44 +84,112 @@ class DataBaseServer{
     this.startServer();
   }
 
+// Функция чтения файла JSON (возвращает промис)
+  async initUsersDb() {
+    try {
+      const data = await fs.readFile(this.pathJson, { encoding: 'utf8' });
+      this.usersDb = JSON.parse(data);
+    } catch (error) {
+      console.error('Ошибка при разборе файла JSON:', error);
+    }
+  }
+
+  async deleteUsers(userIds){
+    this.usersDb = this.usersDb.filter(user => !userIds.includes(user.userId));
+  }
+
+  async editUser(userId, sip, name, email, phone, password, role){
+    // Ищем пользователя с заданным userId
+    const user = this.usersDb.find(user => userId.includes(user.userId));
+    if (user) {
+      user.sip = sip;
+      user.name = name;
+      user.email = email;
+      user.phone = phone;
+      user.password = password;
+      user.role = role;
+    } else {
+      console.log('Пользователь с userId', userId, 'не найден');
+    }
+  }
+
+  async addUser(sip, name, email, phone, password, role){
+    // Генерируем userId для нового пользователя
+    const userId = this.generateUserId();
+    // Добавляем нового пользователя в массив пользователей
+    this.usersDb.push({id: this.usersDb.length+1, userId: userId, sip: sip, name: name, email: email, phone: phone, password: password, role: role})
+
+  }
+
+  async searchUsersForQuery(query){
+    query = query.toLowerCase();
+    return this.usersDb.filter((user) =>
+      user.name.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.sip.toLowerCase().includes(query) ||
+      user.phone.toLowerCase().includes(query)
+    );
+  }
+
+  async loginUser(email, password, res){
+    try {
+      const user = this.usersDb.find((user) => user.email === email);
+      if (!user) {
+        return res.status(400).json({ error: 'Login is failed' });
+      }
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        return res.status(400).json({ error: 'Login is failed' });
+      }
+
+      const token = this.generateJwtToken(user);
+      res.json({ Token: token });
+    } catch (error){
+      res.json({ Token: false });
+    }
+
+  }
+
+  async verificationUser(userToken, res){
+    try {
+      const decoded = jwt.verify(userToken, this.keyForToken);
+      const { Id: userId, Email: email } = decoded;
+
+      const isUser = this.usersDb.some((user) => user.email === email && user.userId === userId);
+      console.log('Verification token');
+      console.log({ userId, email });
+      console.log(isUser);
+
+      res.json({ isVerified: isUser });
+    } catch (error) {
+      res.json({ isVerified: false });
+    }
+  }
+
+  generateUserId(){
+    let userId = 0;
+    /// Бесконечный цикл для генерации userId
+    while (true){
+      userId = Math.floor(Math.random() * 99999999) + 1; // генерация случайного числа от 1 до 99999999
+      const result  = this.usersDb.find((user) => user.userId === userId) // проверка, существует ли пользователь с таким userId
+      if (!result){
+        break // если такого userId нет, выходим из цикла
+      }
+    }
+    return userId // возвращаем сгенерированный уникальный userId
+  }
+
   // Функция генерации токена
   generateJwtToken(user) {
     const data = {
       Id: user.userId,
       Email: user.email,
     };
-
     const jwtToken = jwt.sign(data, this.keyForToken, {algorithm: 'HS256'});
     console.log(jwtToken)
-
     // Возврат строки, представляющей токен и подпись
     return jwtToken
-  }
-
-// Функция чтения файла JSON (возвращает промис)
-  async initUsersDb() {
-    try {
-      const data = await fs.promises.readFile(this.pathJson, { encoding: 'utf8' });
-      this.usersDb = JSON.parse(data);
-    } catch (error) {
-      console.error('Ошибка при разборе файла JSON:', error);
-      throw error;
-    }
-  }
-  async deleteUsers(userIds){
-    this.usersDb = this.usersDb.filter(user => !userIds.includes(user.userId));
-  }
-  async editUser(userId, sip, name, email, phone, password, role){
-    // Ищем пользователя с заданным userId
-    const userIndex = this.usersDb.findIndex((user) => user.userId === userId)
-    if (userIndex !== -1) {
-      this.usersDb[userIndex].name = name;
-      this.usersDb[userIndex].email = email;
-      this.usersDb[userIndex].phone = phone;
-      this.usersDb[userIndex].sip = sip;
-      this.usersDb[userIndex].password = password;
-      this.usersDb[userIndex].role = role;
-    }
   }
 
   createRoutes() {
@@ -139,47 +204,67 @@ class DataBaseServer{
       }
     });
 
+    this.app.post('/api/deleteUsers', async (req, res) => {
+      try {
+        const { userIds } = req.body;
+        await this.deleteUsers(userIds)
+        res.json({success: true});
+      } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+      }
+    });
+
+    this.app.post('/api/editUser', async (req, res) => {
+      try {
+        const { userId, name, email, phone, sip, password, role } = req.body;
+        await this.editUser(userId, sip, name, email, phone, password, role);
+        res.json({ success: true });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+      }
+    });
+
+    this.app.post('/api/addUser', async (req, res) => {
+      try {
+        const { name, email, phone, sip, password, role } = req.body;
+        await this.addUser(sip, name, email, phone, password, role);
+        res.json({ success: true });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+      }
+    });
+
+    this.app.post('/api/searchUsersForQuery', async (req, res) => {
+      try {
+        const { query } = req.body;
+        const usersResult = await this.searchUsersForQuery(query);
+        res.json(usersResult);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+      }
+    });
+
     this.app.post('/api/login', async (req, res) => {
       try {
         const {email, password} = req.body;
         if (!email || !password) {
-          return res.status(400).json({error: 'Email and password are required'});
+          return res.status(400).json({ error: 'Email and password are required' });
         }
-
-        const user = this.usersDb.find(user => user.email === email);
-        if (!user) {
-          return res.status(400).json({error: 'Login is failed'});
-        }
-
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        console.log(await bcrypt.hash(password, 10))
-        if (!passwordMatch) {
-          return res.status(400).json({error: 'Login is failed'});
-        }
-
-        const token = this.generateJwtToken(user);
-        res.json({Token: token});
+        await this.loginUser(email, password, res)
       } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
       }
     });
 
-    this.app.post('/api/deleteUsers', async (req, res) => {
+    this.app.post('/api/verification', async (req, res) => {
       try {
-        const UserIds = req.body.userIds
-        await this.deleteUsers(UserIds)
-        res.json({success: true});
-      } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-      }
-    });
-    this.app.post('/api/editUser', async (req, res) => {
-      try {
-        const { userId, name, email, phone, sip, password, role } = req.body;
-        await this.editUser(userId, name, email, phone, sip, password, role);
-        res.json({success: true});
+        const { userToken } = req.body;
+        await this.verificationUser(userToken, res)
       } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -193,6 +278,8 @@ class DataBaseServer{
       console.log(`Сервер запущен на порту ${this.port}`);
     });
   }
+
+
 }
 
 const dataBaseServer = new DataBaseServer();

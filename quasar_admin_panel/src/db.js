@@ -11,6 +11,7 @@ window.process.env = { NODE_DEBUG: '' };
 window.process.version = 'v' + navigator.appVersion;
 window.Buffer = Buffer;
 const fs = require('fs');
+const axios = require('axios');
 
 class Database {
   keyForToken = "z%C*F-J@NcRfUjXn2r5u8x/A?D(G+KbP"
@@ -44,18 +45,17 @@ class Database {
   }
 
 // Функция для генерации токена по email и паролю пользователя
-  generatedTokenByEmailAndPassword(email, password) {
-    // Проверяем наличие email и password
-    if (email && password) {
-      // Ищем пользователя с заданным email и паролем
-      const user = this.usersList.find(user => user.email === email && user.password === password)
-      if (user){
-        // Если пользователь найден, то генерируем для него токен
-        return this.generateToken(user);
+  async generatedAuthTokenByEmailAndPassword(email, password) {
+    try {
+      const response = await axios.post('http://localhost:3000/api/login', { email, password });
+      if (response.data.isVerified === true) {
+
       }
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
-    // Если email или password не заданы или пользователь не найден, то возвращаем false
-    return false;
   }
 
   deleteUsers(idList){
@@ -161,6 +161,18 @@ class Database {
     return `${token}.${signature}`;
   }
   verificationToken(token){
+    const verification = async (token) => {
+      try {
+        const response = await axios.post('http://localhost:3000/api/verification', { token });
+        return response.data;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
+    };
+
+
+
     // Разделяем токен на 3 части: заголовок, данные и подпись
     const [encodedHeader, encodedData, signature] = token.split('.');
 
