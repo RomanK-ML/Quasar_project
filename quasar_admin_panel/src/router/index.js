@@ -7,6 +7,8 @@ import {
 } from "vue-router";
 import routes from "./routes";
 import db from "src/db";
+import VueCookies from "vue-cookies";
+import async from "async";
 
 /*
  * If not building with SSR mode, you can
@@ -37,25 +39,27 @@ export default route(function (/* { store, ssrContext } */) {
     ),
   });
 
-  Router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem('token')
-    const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-    if (requiresAuth && !token){
-      next({name: 'login'});
-    } else if (requiresAuth && token){
-      db.updateDb()
-      const result = db.verificationToken(token)
-      if (result){
-        next()
-      }else {
-        localStorage.removeItem('token')
-        next({name: 'login'});
+  Router.beforeEach(async (to, from, next) => {
+    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+    console.log('requiresAuth: ' + requiresAuth)
+    if (requiresAuth) {
+      console.log("requiresAuthTrue");
+      const isAuth = await db.verificationToken();
+      console.log("isAuth: " + isAuth)
+      if (isAuth) {
+        next();
+      }
+      else {
+        next({ name: "login" });
+      }
+    }else if (to.matched.some((record) => record.name === "login")){
+      const isAuth = await db.verificationToken();
+      if (isAuth) {
+        next({ name: "dashboard" });
       }
     }
-    else {
-      next()
-    }
-  })
+    next();
+  });
 
   return Router;
 });

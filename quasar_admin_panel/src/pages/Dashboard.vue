@@ -13,17 +13,17 @@
 import db from "src/db";
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Dashboard',
+  name: "Dashboard",
   mounted() {
-    db.updateDb()
-    this.usersCount = db.usersList.length
+    db.updateDb();
+    this.usersCount = db.usersList.length;
   },
-  data(){
-    return{
+  data() {
+    return {
       usersCount: 0,
-    }
-  }
-}
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -39,18 +39,18 @@ export default {
     width: 50%;
   }
 }
-.dashboard-row{
+.dashboard-row {
   flex-shrink: 0;
   margin-top: 0;
   max-width: 100%;
-  padding-left: calc(24px *.5);
-  padding-right: calc(24px *.5);
+  padding-left: calc(24px * 0.5);
+  padding-right: calc(24px * 0.5);
   width: 100%;
   background: transparent;
 }
 
 .card {
-  box-shadow: 0 0 .875rem 0 rgba(34,46,60,.05);
+  box-shadow: 0 0 0.875rem 0 rgba(34, 46, 60, 0.05);
   margin-bottom: 24px;
   max-width: 400px;
   word-wrap: break-word;
@@ -63,20 +63,20 @@ export default {
   min-width: 0;
   position: relative;
 }
-.card-body{
+.card-body {
   flex: 1 1 auto;
   padding: 1.25rem;
 }
-.card-title{
+.card-title {
   color: #d3d5d8;
-  font-size: .925rem;
+  font-size: 0.925rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
   margin-top: 0;
 }
-.card-data{
-  margin-bottom: 1rem!important;
-  margin-top: .25rem!important;
+.card-data {
+  margin-bottom: 1rem !important;
+  margin-top: 0.25rem !important;
   font-size: 1.75rem;
   color: #fff;
   font-weight: 400;

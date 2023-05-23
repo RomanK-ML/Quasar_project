@@ -12,9 +12,7 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 
 const { configure } = require("quasar/wrappers");
 
-
 module.exports = configure(function (ctx) {
-
   return {
     // https://v2.quasar.dev/quasar-cli-webpack/supporting-ts
     supportTS: false,
@@ -50,29 +48,29 @@ module.exports = configure(function (ctx) {
       //   NODE_DEBUG: 'crypto',
       // },
 
-      extendWebpack (cfg) {
+      extendWebpack(cfg) {
         cfg.resolve.fallback = {
-          crypto: require.resolve('crypto-browserify'),
-          zlib: require.resolve('browserify-zlib'),
-          fs: require.resolve('browserify-fs'),
-          path: require.resolve('path-browserify'),
-          buffer: require.resolve('buffer'),
-          process: require.resolve('processify'),
-        }
+          crypto: require.resolve("crypto-browserify"),
+          zlib: require.resolve("browserify-zlib"),
+          fs: require.resolve("browserify-fs"),
+          path: require.resolve("path-browserify"),
+          buffer: require.resolve("buffer"),
+          process: require.resolve("processify"),
+        };
       },
-      configureWebpack:{
+      configureWebpack: {
         resolve: {
           fallback: {
-            crypto: require.resolve('crypto-browserify'),
-            stream: require.resolve('stream-browserify'),
-            util: require.resolve('util.promisify'),
-            zlib: require.resolve('pako'),
-            fs: require.resolve('browserify-fs'),
-            path: require.resolve('path-browserify'),
-            buffer: require.resolve('buffer'),
-            process: require.resolve('processify'),
-          }
-        }
+            crypto: require.resolve("crypto-browserify"),
+            stream: require.resolve("stream-browserify"),
+            util: require.resolve("util.promisify"),
+            zlib: require.resolve("pako"),
+            fs: require.resolve("browserify-fs"),
+            path: require.resolve("path-browserify"),
+            buffer: require.resolve("buffer"),
+            process: require.resolve("processify"),
+          },
+        },
       },
       vueRouterMode: "history", // available values: 'hash', 'history'
 

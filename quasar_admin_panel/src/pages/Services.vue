@@ -5,10 +5,8 @@
 <script>
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Services'
-}
+  name: "Services",
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

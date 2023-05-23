@@ -1,6 +1,6 @@
 <template>
   <q-layout class="bg-dark" width="100%" hight="100%">
-    <router-view/>
+    <router-view />
   </q-layout>
 </template>
 
@@ -8,6 +8,6 @@
 import db from "src/db";
 
 export default {
-  name: 'auth-layout',
-}
+  name: "auth-layout",
+};
 </script>

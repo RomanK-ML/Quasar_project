@@ -1,15 +1,15 @@
 <template>
   <div class="wrapper">
-    <Sidebar :isOpenSidebar="isOpenSidebar"/>
+    <Sidebar :isOpenSidebar="isOpenSidebar" />
     <div class="main">
-      <Navbar @navbar-clicked="navbarToggleClick"/>
+      <Navbar @navbar-clicked="navbarToggleClick" />
       <main class="content">
-        <div  class="content-container">
+        <div class="content-container">
           <div class="title-container">
-            <h1 class="content-title">{{title}}</h1>
+            <h1 class="content-title">{{ title }}</h1>
           </div>
 
-          <router-view/>
+          <router-view />
         </div>
       </main>
     </div>
@@ -17,43 +17,43 @@
 </template>
 
 <script>
-
 import { defineComponent, ref } from "vue";
 import Navbar from "components/Navbar.vue";
 import Sidebar from "components/Sidebar.vue";
 import db from "src/db";
 
 export default {
-  name: 'MainLayout',
+  name: "MainLayout",
   components: {
     Navbar,
     Sidebar,
   },
   computed: {
-    title () {
-      return this.$route.meta.title
-    }
+    title() {
+      return this.$route.meta.title;
+    },
   },
-  data () {
+  data() {
     return {
-      isOpenSidebar: true
-    }
+      isOpenSidebar: true,
+    };
   },
   methods: {
-    navbarToggleClick (data) {
-      this.isOpenSidebar = data
-    }
-  }
-}
-
+    navbarToggleClick(data) {
+      this.isOpenSidebar = data;
+    },
+  },
+};
 </script>
 
 <style scoped>
-*, :after, :before {
+*,
+:after,
+:before {
   box-sizing: border-box;
 }
 
-.wrapper{
+.wrapper {
   align-items: stretch;
   display: flex;
   width: 100%;
@@ -70,16 +70,17 @@ export default {
   min-height: 100vh;
   min-width: 0;
   overflow: hidden;
-  transition: margin-left .35s ease-in-out,left .35s ease-in-out,margin-right .35s ease-in-out,right .35s ease-in-out;
+  transition: margin-left 0.35s ease-in-out, left 0.35s ease-in-out,
+    margin-right 0.35s ease-in-out, right 0.35s ease-in-out;
   width: 100%;
   direction: rtl;
 }
 
-.content{
+.content {
   direction: ltr;
   flex: 1;
   max-width: 100vw;
-  padding: 1.5rem 1.5rem .75rem;
+  padding: 1.5rem 1.5rem 0.75rem;
 }
 
 @media (min-width: 768px) {
@@ -95,8 +96,8 @@ export default {
   }
 }
 
-.content-container{
-  padding: 0!important;
+.content-container {
+  padding: 0 !important;
   --bs-gutter-x: 0.75rem;
   --bs-gutter-y: 0;
   margin-left: auto;
@@ -104,9 +105,9 @@ export default {
   width: 100%;
 }
 
-.title-container{
-  padding: 0!important;
-  margin-bottom: 1rem!important;
+.title-container {
+  padding: 0 !important;
+  margin-bottom: 1rem !important;
   --bs-gutter-x: 0.75rem;
   --bs-gutter-y: 0;
   margin-left: auto;
@@ -114,15 +115,14 @@ export default {
   width: 100%;
 }
 
-.content-title{
-  display: inline!important;
-  vertical-align: middle!important;
+.content-title {
+  display: inline !important;
+  vertical-align: middle !important;
   font-size: 1.3125rem;
   color: #fff;
   font-weight: 400;
   line-height: 1.2;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
   margin-top: 0;
 }
-
 </style>
