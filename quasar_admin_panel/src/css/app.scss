@@ -48,7 +48,7 @@ body {
 }
 .q-field__label {
   left: -50px;
-  top: 5px !important;
+  top: 4px !important;
   font-weight: 400;
   font-size: 0.875rem;
   line-height: 1.5;
@@ -86,4 +86,42 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.q-field__control{
+  border: 1px solid #7a828a;
+  border-radius: .1rem;
+  height: auto!important;
+  min-height: 28px!important;
+}
+.q-field__control-container{
+  height: auto;
+}
+.q-field__control-container .q-field__native{
+  display: flex;
+  border: none;
+  font-size: .75rem;
+  padding-bottom: .2rem!important;
+  padding-left: .5rem!important;
+  padding-top: .2rem!important;
+  min-height: 10px!important;
+  height: auto;
+}
+.q-field__control .q-field__append{
+  display: flex;
+  padding-left: 0!important;
+  border: none;
+  margin-left: 0;
+  min-height: 25px!important;
+  height: auto!important;
+}
+.q-menu{
+  color: #bdc0c5;
+  background-color: #222e3c;
+}
+.q-manual-focusable--focused{
+  background-color: #1976d2;
+  color: #e9ecef!important;
 
+}
+.q-item--active{
+  color: #bdc0c5!important;
+}

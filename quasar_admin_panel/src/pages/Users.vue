@@ -12,27 +12,11 @@
       :selected-rows-label="getSelectedString"
       selection="multiple"
       v-model:selected="selected"
-      :pagination="pagination"
       :rows-per-page="pagination.rowsPerPage"
       @update:rows-per-page="this.pagination.rowsPerPage = $event"
       :rows-per-page-options="pagination.rowsPerPageOptions"
-      :rows-per-page-label="'Количество записей на странице'"
+      :rows-per-page-label="pagination.rowsPerPageLabel"
     >
-      <template v-slot:body-cell-action="props">
-        <td class="btn-action-container">
-          <q-btn
-            color="info"
-            label="Редактировать"
-            @click="openModalEditUser(props.row)"
-          ></q-btn>
-          <q-btn
-            color="negative"
-            label="Удалить"
-            @click="deleteRow(props.row.userId)"
-          ></q-btn>
-        </td>
-      </template>
-
       <template v-slot:top>
         <div class="table-top">
           <!--        <div class="tableHeader-container">-->
@@ -60,19 +44,29 @@
           </div>
           <div class="tableHeader-container">
             <div style="text-align: right">
-              <q-input
-                @change="modalSearchTextUpdate"
-                label="Поиск:"
-                class="header-label"
-                borderless
-                dense
-                :debounce="300"
-                v-model="modalSearch"
-              />
+              <span class="q-field__label">Поиск:</span>
+              <input @input="modalSearchTextUpdate" v-model="modalSearch" class="header-label q-field__native">
             </div>
           </div>
         </div>
       </template>
+
+      <template v-slot:body-cell-action="props">
+        <td class="btn-action-container">
+          <q-btn
+            color="info"
+            label="Редактировать"
+            @click="openModalEditUser(props.row)"
+          ></q-btn>
+          <q-btn
+            color="negative"
+            label="Удалить"
+            @click="deleteRow(props.row.userId)"
+          ></q-btn>
+        </td>
+      </template>
+
+
       <template v-slot:pagination="scope">
         <div class="q-table__control">
           <q-btn
@@ -277,8 +271,10 @@ export default {
         descending: false, // порядок сортировки
         page: 1, // текущая страница
         rowsPerPage: 5, // количество строк на странице
-        rowsPerPageOptions: [5, 10, 20, 30, 40], // опции количества строк на странице
+        rowsPerPageOptions: [5, 10, 20, 30, 40, 50, 0], // опции количества строк на странице
+        rowsPerPageLabel: 'Количество записей на странице',
         totalRows: 20, // общее количество строк в таблице
+
       },
       columns: [
         // настройки колонок таблицы
@@ -527,6 +523,7 @@ export default {
     },
     modalSearchTextUpdate() {
       console.log("modalSearchTextUpdate");
+      console.log(this.modalSearch);
       // если в поисковой строке введено достаточно символов, вызываем функцию поиска пользователей в базе данных
       if (this.modalSearch.length >= this.searchMinCharacters) {
         db.searchUsers(this.modalSearch);
@@ -589,6 +586,9 @@ export default {
     flex: 0 0 auto;
     width: 50%;
   }
+}
+.tableHeader-container button{
+  margin: 0 5px;
 }
 
 .header-label {
