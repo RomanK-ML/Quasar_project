@@ -10,7 +10,7 @@ class DataBaseServer {
   port = 3000;
   app = express();
   isJson = true;
-  pathJson = "server/data.json";
+  pathJson = "server/users-100000.json";
   keyForToken = "z%C*F-J@NcRfUjXn2r5u8x/A?D(G+KbP";
   usersDb = [];
 
@@ -137,6 +137,12 @@ class DataBaseServer {
     try {
       // Генерируем userId для нового пользователя
       const userId = this.generateUserId();
+
+      const saltRounds = 10;
+      const salt = bcrypt.genSaltSync(saltRounds);
+      // Создание хэша пароля
+      const hashedPassword = bcrypt.hashSync(password, salt);
+
       // Добавляем нового пользователя в массив пользователей
       this.usersDb.push({
         id: this.usersDb.length + 1,
@@ -145,7 +151,7 @@ class DataBaseServer {
         name: name,
         email: email,
         phone: phone,
-        password: password,
+        password: hashedPassword,
         role: role,
       });
       res.json({ status: "accepted", success: true });
@@ -173,13 +179,14 @@ class DataBaseServer {
   async loginUser(email, password, res) {
     try {
       const user = this.usersDb.find((user) => user.email === email);
+      console.log(user)
       if (!user) {
-        return res.json({ status: "error", message: "Login is failed" });
+        return res.json({ status: "error", message: "Login is failed for user" });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) {
-        return res.json({ status: "error", message: "Login is failed" });
+        return res.json({ status: "error", message: "Login is failed for password" });
       }
 
       const token = this.generateJwtToken(user);
@@ -212,7 +219,7 @@ class DataBaseServer {
     let userId = 0;
     /// Бесконечный цикл для генерации userId
     while (true) {
-      userId = Math.floor(Math.random() * 99999999) + 1; // генерация случайного числа от 1 до 99999999
+      userId = Math.floor(10000000 + Math.random() * 90000000); // Генерация уникального userId состоящего из 8 цифр
       const result = this.usersDb.find((user) => user.userId === userId); // проверка, существует ли пользователь с таким userId
       if (!result) {
         break; // если такого userId нет, выходим из цикла

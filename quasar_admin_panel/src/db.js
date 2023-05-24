@@ -224,7 +224,10 @@ class Database {
 
   constructor() {
     console.log("Database constructor");
-    this.updateDb();
+    this.initialize();
+  }
+  async initialize() {
+    await this.updateDb();
   }
 
   // Функция для генерации токена по email и паролю пользователя
@@ -340,7 +343,11 @@ class Database {
     try {
       const response = await axios.post("http://localhost:3000/api/allUsers");
       if (response.data.status === "accepted") {
-        this.usersList.splice(0, this.usersList.length, ...response.data.users);
+        this.usersList.length = 0;
+        for (let responseId in response.data.users){
+          this.usersList.push(response.data.users[[responseId]]);
+        }
+
       }
     } catch (error) {
       console.error(error);

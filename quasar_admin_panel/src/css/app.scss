@@ -118,10 +118,28 @@ button {
   background-color: #222e3c;
 }
 .q-manual-focusable--focused{
-  background-color: #1976d2;
+  background-color: var(--q-primary);
   color: #e9ecef!important;
 
 }
 .q-item--active{
-  color: #bdc0c5!important;
+  color: var(--q-dark-page)!important;
 }
+.q-checkbox:hover .q-checkbox__inner{
+  //color: var(--q-primary)!important;
+  //background-color: var(--q-primary)!important;
+}
+.q-checkbox__inner {
+  color: #bdc0c5;
+}
+.q-checkbox__inner--truthy, .q-checkbox__inner--indet {
+  color: var(--q-primary)!important;
+}
+.checkbox__bg {
+  background-color: #222e3c;
+}
+.q-checkbox__bg{
+  border-width: 1px;
+}
+
+
