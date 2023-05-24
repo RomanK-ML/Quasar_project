@@ -5,6 +5,7 @@
       class="table-body"
       flat
       bordered
+      :loading="loading"
       :columns="columns"
       :rows="rows"
       row-key="id"
@@ -17,6 +18,9 @@
       :rows-per-page-options="pagination.rowsPerPageOptions"
       :rows-per-page-label="pagination.rowsPerPageLabel"
     >
+      <template v-slot:loading>
+        <q-inner-loading showing color="primary"></q-inner-loading>
+      </template>
       <template v-slot:top>
         <div class="table-top">
           <!--        <div class="tableHeader-container">-->
@@ -250,6 +254,7 @@ export default {
   name: "Users",
   data() {
     return {
+      loading: true,
       modalUserId: 0, // id пользователя в модальном окне
       modalSip: "", // SIP пользователя в модальном окне
       modalName: "", // имя пользователя в модальном окне
@@ -384,6 +389,7 @@ export default {
     db.updateDb().then(() => {
       this.rows = db.usersList;
       this.pagination.totalRows = this.rows.length;
+      this.loading = false
     });
   },
   //следит за изменением массива выбранных пользователей и обновляющее строку с информацией о количестве выбранных пользователей
@@ -428,8 +434,13 @@ export default {
       console.log("delete");
       console.log(userId);
       console.log(db.usersList);
+      this.loading = true;
       db.deleteUsers([userId]);
-      this.deleteItemForSelectedList(userId);
+      db.deleteUsers([userId]).then(() => {
+        this.deleteItemForSelectedList(userId);
+        this.pagination.totalRows = this.rows.length;
+        this.loading = false;
+      });
       console.log(db.usersList);
     },
     // Метод удаляет выбранные строки из таблицы и из базы данных
@@ -437,14 +448,23 @@ export default {
       // Получение списка ID выбранных строк
       const idList = this.selected.map((item) => item.userId);
       if (idList.length > 0) {
+        this.loading = true;
         // Удаление выбранных строк из базы данных
-        db.deleteUsers(idList);
+        db.deleteUsers(idList).then(() => {
+          this.selected = [];
+          this.pagination.totalRows = this.rows.length;
+          this.loading = false;
+        });
         // Очистка списка выбранных строк
         this.selected = [];
       }
     },
     refreshTable(){
-      db.updateDb()
+      this.loading = true;
+      db.updateDb().then(() => {
+        this.pagination.totalRows = this.rows.length;
+        this.loading = false;
+      })
     },
     // Открыть модальное окно для добавления нового пользователя
     openModalAddUser() {
@@ -492,6 +512,7 @@ export default {
     },
     // Отправить форму для добавления нового пользователя
     modalAddUserSubmit() {
+      this.loading = true;
       // Вызвать функцию добавления пользователя из базы данных, используя значения из модального окна
       db.addUser(
         this.modalSip,
@@ -500,11 +521,15 @@ export default {
         this.modalPhone,
         this.modalPassword,
         this.modalRole
-      );
+      ).then(()  => {
+        this.pagination.totalRows = this.rows.length;
+        this.loading = false;
+      });
       // Скрыть модальное окно
       this.modalEditUserShown = false;
     },
     modalEditUserSubmit() {
+      this.loading = true;
       // вызов функции редактирования пользователя из базы данных
       db.editUser(
         this.modalUserId,
@@ -514,7 +539,9 @@ export default {
         this.modalPhone,
         this.modalPassword,
         this.modalRole
-      );
+      ).then(()  => {
+        this.loading = false;
+      });
       // вывод данных пользователя, которые были изменены
       console.log("modalId: " + this.modalUserId);
       console.log("modalSip: " + this.modalSip);
@@ -535,12 +562,13 @@ export default {
       console.log(this.modalSearch);
       // если в поисковой строке введено достаточно символов, вызываем функцию поиска пользователей в базе данных
       if (this.modalSearch.length >= this.searchMinCharacters) {
-        db.searchUsers(this.modalSearch);
+        this.loading = true;
+        db.searchUsers(this.modalSearch).then(()  => {
+          // обновляем общее количество пользователей в пагинации
+          this.pagination.totalRows = this.rows.length;
+          this.loading = false;
+        });
       }
-      // обновляем список пользователей на странице
-      this.rows = db.usersList;
-      // обновляем общее количество пользователей в пагинации
-      this.pagination.totalRows = this.rows.length;
     },
   },
 };
@@ -560,7 +588,9 @@ export default {
   box-shadow: 0 0 0.875rem 0 rgba(34, 46, 60, 0.05);
   margin-bottom: 24px;
 }
-
+.q-inner-loading{
+  background: rgb(2 2 2 / 40%);
+}
 .table-body {
   flex: 1 1 auto;
   padding: 1.25rem;
