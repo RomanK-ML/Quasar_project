@@ -4,7 +4,9 @@ import Cookies from 'js-cookie';
 
 class Database {
   usersList = reactive([]); // Реактивный массив пользователей
-
+  apiProtocol = 'http';
+  apiHost = 'localhost';
+  apiPort = 3000;
   constructor() {
     console.log("Database constructor");
     this.updateDb();// Вызываем функцию обновления базы данных при создании экземпляра класса
@@ -12,7 +14,7 @@ class Database {
   // Функция для авторизации пользователя по email и паролю
   async authorizationUser(email, password) {
     try {
-      const response = await axios.post("http://localhost:3000/api/login", {
+      const response = await axios.post(this.apiProtocol + "://" + this.apiHost + ":" + this.apiPort + "/api/login", {
         email,
         password,
       });
@@ -41,7 +43,7 @@ class Database {
       console.log("USER IDS");
       console.log(userIds.toString()); // выводим список id пользователей, которых нужно удалить
       const response = await axios.post(
-        "http://localhost:3000/api/deleteUsers",
+        this.apiProtocol + "://" + this.apiHost + ":" + this.apiPort + "/api/deleteUsers",
         { userIds }
       );
       if (response.data.status === "error") {
@@ -55,7 +57,7 @@ class Database {
   // Редактирование информации о пользователе
   async editUser(userId, sip, name, email, phone, password, role) {
     try {
-      const response = await axios.post("http://localhost:3000/api/editUser", {
+      const response = await axios.post(this.apiProtocol + "://" + this.apiHost + ":" + this.apiPort + "/api/editUser", {
         userId,
         name,
         email,
@@ -84,7 +86,7 @@ class Database {
    */
   async addUser(sip, name, email, phone, password, role) {
     try {
-      const response = await axios.post("http://localhost:3000/api/addUser", {
+      const response = await axios.post(this.apiProtocol + "://" + this.apiHost + ":" + this.apiPort + "/api/addUser", {
         name,
         email,
         phone,
@@ -108,7 +110,7 @@ class Database {
   async searchUsers(query) {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/searchUsersForQuery",
+        this.apiProtocol + "://" + this.apiHost + ":" + this.apiPort + "/api/searchUsersForQuery",
         { query }
       );
       if (response.data.status === "accepted") {
@@ -121,7 +123,7 @@ class Database {
   // Обновление базы данных пользователей
   async updateDb() {
     try {
-      const response = await axios.post("http://localhost:3000/api/allUsers");
+      const response = await axios.post(this.apiProtocol + "://" + this.apiHost + ":" + this.apiPort + "/api/allUsers");
       if (response.data.status === "accepted") {
         this.usersList.length = 0;  // Очистка массива пользователей
         for (let responseId in response.data.users){
@@ -142,7 +144,7 @@ class Database {
         return false;
       }
       console.log("Getting token: " + userToken);
-      const response = await axios.post("http://localhost:3000/api/verification",
+      const response = await axios.post(this.apiProtocol + "://" + this.apiHost + ":" + this.apiPort + "/api/verification",
         { userToken });
       console.log('DataStatus: ' + response.data.status);
       if (response.data.status === "accepted") {
