@@ -40,7 +40,12 @@
               color="negative"
               label="Удалить выделенное"
               @click="deleteSelectedRow"
-            ></q-btn>
+            />
+            <q-btn
+              color="info"
+              label="Перезагрузить таблицу"
+              @click="refreshTable"
+            />
           </div>
           <div class="tableHeader-container">
             <div style="text-align: right">
@@ -271,7 +276,7 @@ export default {
         descending: false, // порядок сортировки
         page: 1, // текущая страница
         rowsPerPage: 5, // количество строк на странице
-        rowsPerPageOptions: [5, 10, 20, 30, 40, 50, 0], // опции количества строк на странице
+        rowsPerPageOptions: [5, 10, 20, 30, 40, 50], // опции количества строк на странице
         rowsPerPageLabel: 'Количество записей на странице',
         totalRows: 20, // общее количество строк в таблице
 
@@ -376,9 +381,10 @@ export default {
   },
   //происходит обновление базы данных, установка начальных значений таблицы и инициализация пагинации
   mounted() {
-    db.updateDb();
-    this.rows = db.usersList;
-    this.pagination.totalRows = this.rows.length;
+    db.updateDb().then(() => {
+      this.rows = db.usersList;
+      this.pagination.totalRows = this.rows.length;
+    });
   },
   //следит за изменением массива выбранных пользователей и обновляющее строку с информацией о количестве выбранных пользователей
   watch: {
@@ -436,6 +442,9 @@ export default {
         // Очистка списка выбранных строк
         this.selected = [];
       }
+    },
+    refreshTable(){
+      db.updateDb()
     },
     // Открыть модальное окно для добавления нового пользователя
     openModalAddUser() {

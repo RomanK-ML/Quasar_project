@@ -15,8 +15,15 @@ export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Dashboard",
   mounted() {
-    db.updateDb();
-    this.usersCount = db.usersList.length;
+    if (db.usersList.length === 0) {
+      db.updateDb().then(() => {
+        this.usersCount = db.usersList.length;
+      });
+    }
+    else {
+      this.usersCount = db.usersList.length;
+    }
+
   },
   data() {
     return {
